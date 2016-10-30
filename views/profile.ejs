@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>My Profile</title>
+        <link rel="stylesheet" type="text/css" href="styles/main.css">
+        <script>
+            function editInfo() {
+                var info_div        = document.getElementById("info_div"),
+                    edit_info_div   = document.getElementById("edit_info_div");
+
+                info_div.style.display       = "none";
+                edit_info_div.style.display  = "block";
+                
+                return;
+            }
+
+            function cancelEdit() {
+                var info_div        = document.getElementById("info_div"),
+                    edit_info_div   = document.getElementById("edit_info_div");
+
+                edit_info_div.style.display  = "none";
+                info_div.style.display       = "block";
+            }
+
+            function makeTrans(trans_id, accept) {
+                var form = document.createElement("form");
+                form.setAttribute("method", "post");
+                form.setAttribute("action", "/transaction");
+                
+                var idField = document.createElement("input");
+                idField.setAttribute("type", "hidden");
+                idField.setAttribute("name", "trans_id")
+                idField.setAttribute("value", trans_id);
+
+                var acceptField = document.createElement("input");
+                acceptField.setAttribute("type", "hidden");
+                acceptField.setAttribute("name", "accept");
+                acceptField.setAttribute("value", accept);
+
+                form.appendChild(idField);
+                form.appendChild(acceptField);
+
+                document.body.appendChild(form);
+                form.submit();
+            }
+
+            function invResponse(house_id, accept) {
+                var form = document.createElement("form");
+                form.setAttribute("method", "post");
+                form.setAttribute("action", "/house");
+
+                var invResp = document.createElement("input");
+                invResp.setAttribute("type", "hidden");
+                invResp.setAttribute("name", "inv_resp");
+                invResp.setAttribute("value", "true");
+                
+                var idField = document.createElement("input");
+                idField.setAttribute("type", "hidden");
+                idField.setAttribute("name", "house_id")
+                idField.setAttribute("value", house_id);
+
+                var acceptField = document.createElement("input");
+                acceptField.setAttribute("type", "hidden");
+                acceptField.setAttribute("name", "accept");
+                acceptField.setAttribute("value", accept);
+
+                form.appendChild(invResp);
+                form.appendChild(idField);
+                form.appendChild(acceptField);
+
+                document.body.appendChild(form);
+                form.submit();
+            }
+        </script>
+    </head>
+    <body>
+        <header>
+            <% include partials/header %>
+        </header>
+        <main>
+            <div class="content">
+                <h1>My Profile</h1>
+                <hr>
+                <div id="info_div">
+                    <h2 id="name"><%= user_info.firstname %> <%= user_info.lastname %></h2>
+                    <h3 id="username"><%= user_info.username %></h3>
+                    <h3 id="email"><%= user_info.email %></h3>
+                    <button onclick="editInfo();">Edit Info</button>
+                </div>
+                <div id="edit_info_div" style="display: none;">
+                    <form action="profile" method="post">
+                        <input type="text" name="firstname" value="<%= user_info.firstname %>" placeholder="First Name"></input>
+                        <input type="text" name="lastname" value="<%= user_info.lastname %>" placeholder="Last Name"></input>
+                        <br><br>
+                        <input type="text" name="email" value="<%= user_info.email %>" placeholder="Email"></input>
+                        <br><br>
+                        <input type="submit" value="Submit Changes"></input>
+                        <button onclick="cancelEdit(); return false;">Cancel</button>
+                    </form> 
+                </div>
+
+                <br><br>
+                <hr>
+
+                <h2>Balance</h2>
+                <h3>$<%= user_info.balance.toFixed(2) %></h3>
+
+                <% if (house_invs.length > 0) { %>
+                <br>
+                <hr>
+                <h2>Pending House Invitation</h2>
+                    <table class="data_tables">
+                        <tr>
+                            <th>From</th>
+                            <th>Address</th>
+                            <th>Accept/Reject</th>
+                        </tr>
+                        <% house_invs.forEach(function(inv) { %>
+                            <tr>
+                                <td><%= inv.username %></td>
+                                <% if (inv.address2 != null && inv.address2.length > 0) { %>
+                                    <td><%= inv.address1 %>, <%= inv.address2 %>, <%= inv.city %>, <%= inv.state %></td>
+                                <% } else { %>
+                                    <td><%= inv.address1 %>, <%= inv.city %>, <%= inv.state %></td>
+                                <% } %>
+                                <td>
+                                    <button onclick="invResponse(<%= inv.house_id %>, 'true');">Accept</button>
+                                    <button onclick="invResponse(<%= inv.house_id %>, 'false'); return false;">Decline</button>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    </table>
+                <% } %>
+
+                <br>
+                <hr>
+
+                <h2>Financial Transactions</h2>
+                <% if (fin_trans == 0) { %>
+                    <p><i>No Financial Transactions</i></p>
+                <% } else { %>
+                    <% var debt = 0; %>
+                    <table id="fin_trans" class="data_tables">
+                        <tr>
+                            <th>To</th>
+                            <th>From</th>
+                            <th>Amount</th>
+                            <th class="wide">Time</th>
+                            <th class="wide"></th>
+                        </tr>
+                        <% fin_trans.forEach(function(trans) { %>
+                            <tr>
+                                <% if (trans.receiver == user_info.username) { %>
+                                    <td>Me</td>
+                                    <td><%= trans.sender %></td>
+                                <% } else { %>
+                                    <td><%= trans.receiver %></td>
+                                    <td>Me</td>
+                                <% } %>
+                                <td>$<%= trans.amount.toFixed(2) %></td>
+                                <td><%= trans.time %></td>
+                                <% if (trans.status == 0) { %>
+                                    <% if (trans.receiver == user_info.username) { %>
+                                        <% debt += trans.amount; %>
+                                        <td>Pending</td>
+                                    <% } else { %>
+                                        <td>
+                                            <% if (trans.amount > user_info.balance) { %>
+                                                <button disabled>Send Money</button>
+                                            <% } else { %>
+                                                <button onclick="makeTrans(<%= trans.trans_id %>, 'true');">Send Money</button>
+                                            <% } %>
+                                            <button onclick="makeTrans(<%= trans.trans_id %>, 'false');">Decline</button>
+                                        </td>
+                                    <% } %>
+                                <% } else if (trans.status == 1) { %>
+                                    <% if (trans.sender == user_info.username) { %>
+                                        <% debt -= trans.amount; %>
+                                        <td>Pending</td>
+                                    <% } else { %>
+                                        <td>
+                                            <button onclick="makeTrans(<%= trans.trans_id %>, 'true');">Accept</button>
+                                            <button onclick="makeTrans(<%= trans.trans_id %>, 'false');">Decline</button>
+                                        </td>
+                                    <% } %>
+                                <% } else if (trans.status == 2) { %>
+                                    <td>Accepted</td>
+                                <% } else { %>
+                                    <td>Declined</td>
+                                <% } %>
+                            </tr>
+                        <% }); %>
+                    </table>
+                    <p><i>My house mates owe me:</i> <b>$<%= debt.toFixed(2) %></b></p>
+                <% } %>
+            </div>
+        </main>
+    </body>
+</html>

@@ -1,0 +1,21 @@
+<div id="chat_div">
+    <% for (var i = 15; i > 0; i--) { %>
+        <% if (i > messages.length) { %>
+            <br>
+            <% if (messages.length == 0 && i == 3) { %>
+                <p style="width: 100%; text-align: center;"><i>No Messages</i></p>
+            <% } %>
+        <% } else { %>
+            <% if (messages[i - 1].username == username) { %>
+                <p class="message me"><%= messages[i - 1].message %></p>
+            <% } else { %>
+                <p class="message"><b><%= messages[i - 1].username %></b> <%= messages[i - 1].message %></p>
+            <% } %>
+        <% } %>
+    <% } %>
+    <form id="message_form" action="/house" method="post">
+        <input type="hidden" name="send_message" value="true" />
+        <input id="message_box" type="text" name="message" placeholder="Message" autocomplete="off" />
+        <input id="send_button" type="submit" value="Send" />
+    </form>
+</div>

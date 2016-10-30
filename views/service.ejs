@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>My House</title>
+        <link rel="stylesheet" type="text/css" href="styles/main.css">
+    </head>
+    <body>
+        <header>
+            <div id="header">
+                <ul>
+                    <li><a href="/"><b>Splytr</b></a></li>
+                    <li><a>|</a></li>
+                    <li><a href="/service">My Service</a></li>
+                </ul>
+            </div>
+        </header>
+        <main>
+            <div class="content">
+                <h1>My Service</h1>
+                <hr>
+                <h2><%= provider_info.name %></h2>
+                <h3><%= provider_info.service %></h3>
+                <br>
+                <hr>
+                <h2>Add a Bill</h2>
+                <br>
+                <form action="/service" method="post">
+                    <input type="hidden" name="add_bill" value="true" />
+                    <input type="text" name="address1" placeholder="Address Line 1" required />
+                    <br><br>
+                    <input type="text" name="address2" placeholder="Address Line 2" />
+                    <br><br>
+                    <input type="text" name="city" placeholder="City" required></input>
+                    <br><br>
+                    <% include partials/states %>
+                    <br><br>
+                    <input type="text" name="zip" placeholder="Zip Code" onkeypress="return event.charCode >= 48 && event.charCode <= 57" required />
+                    <br><br>
+                    <p>Start Date:
+                    <% include partials/dates %>
+                    </p>
+                    <p>Frequency:
+                    <input type="number" name="freq" placeholder="#" />
+                    time(s) per 
+                    <select name="freq_type" required>
+                        <option value="week">Week</option>
+                        <option value="month" selected>Month</option>
+                        <option value="year">Year</option>
+                    </select>
+                    <br><br>
+                    <input type="submit" value="Submit Bill" required />
+                </form>
+                <% if (bills != null && bills.length > 0) { %>
+                    <hr>
+                    <h2>Bills</h2>
+                    <table class="data_tables">
+                        <tr>
+                            <th>Address</th>
+                            <th>Frequency</th>
+                            <th>Start Date</th>
+                            <th>Amount</th>
+                        </tr>
+                        <% bills.forEach(function(bill) { %>
+                            <tr>
+                                <td><%= bill.address1 %>, <%= bill.address2 %>, <%= bill.city %>, <%= bill.state %></td>
+                                <td><%= bill.freq %> time(s) per <%= bill.freq_type %></td>
+                                <td><%= bill.start_date %></td>
+                                <td><%= bill.amout %></td>
+                            </tr>
+                        <% }); %>
+                    </table>
+                <% } %>
+            </div>
+        </main>
+    </body>
+</html>

@@ -1,0 +1,110 @@
+
+/* Main Body */
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+
+/* Header */
+
+#header {
+    width: inherit;
+    background: cadetblue;
+    margin: 0;
+    padding: 1em 1em 1em 8em;
+    box-shadow: 0px 4px 2px #AAA;
+}
+
+#header ul {
+    width: inherit;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+#header li {
+    padding-left: 0.5em;
+    padding-right: 0.5em; 
+    display: inline;
+}
+
+#header a {
+    color: white;
+    text-decoration: none;
+    font-size: 1.5em;
+}
+
+
+/* Content */
+
+.content {
+    padding: 1em 20% 20% 20%;
+}
+
+
+/* Financial Transactions Table */
+
+.data_tables {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data_tables th {
+    padding: 0.5em;
+    background-color: #444;
+    color: #fff;
+}
+
+#fin_trans th:not(.wide) {
+    width: 16%;
+}
+
+#find_trans .wide {
+    width: 26%;
+}
+
+.data_tables td {
+    padding: 0.5em;
+    text-align: center;
+}
+
+.data_tables tr:nth-child(even) {
+    background-color: #EEE;
+}
+
+.data_tables tr::nth-child(odd) {
+    background-color: #FFF;
+}
+
+/* Chat Window */
+
+#chat_div {
+    width: 100%;
+    border-color: #999;
+    border: 1px solid;
+    border-radius: 4px;
+    padding: 1em 0 1em 0;
+}
+
+#chat_div #message_box {
+    width: 80%;
+}
+
+#chat_div #send_button {
+    width: 10%;
+}
+
+#message_form {
+    text-align: center;
+}
+
+.message {
+    margin: 1em;
+}
+
+.me {
+    text-align: right;
+}

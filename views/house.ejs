@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>My House</title>
+        <link rel="stylesheet" type="text/css" href="styles/main.css">
+        <script>
+            function editInfo() {
+                var info_div        = document.getElementById("info_div"),
+                    edit_info_div   = document.getElementById("edit_info_div");
+
+                info_div.style.display       = "none";
+                edit_info_div.style.display  = "block";
+                
+                return;
+            }
+
+            function cancelEdit() {
+                var info_div        = document.getElementById("info_div"),
+                    edit_info_div   = document.getElementById("edit_info_div");
+
+                edit_info_div.style.display  = "none";
+                info_div.style.display       = "block";
+            }
+
+            function removeMate(user_id, username) {
+                var form = document.createElement("form");
+                form.setAttribute("method", "post");
+                form.setAttribute("action", "/house");
+
+                var remove_mate = document.createElement("input");
+                remove_mate.setAttribute("type", "hidden");
+                remove_mate.setAttribute("name", "remove_mate")
+                remove_mate.setAttribute("value", "true");
+                
+                var idField = document.createElement("input");
+                idField.setAttribute("type", "hidden");
+                idField.setAttribute("name", "user_id")
+                idField.setAttribute("value", user_id);
+
+                form.appendChild(remove_mate);
+                form.appendChild(idField);
+
+                document.body.appendChild(form);
+                form.submit();
+            }
+
+            function restrict(user_id, restrict) {
+                var form = document.createElement("form");
+                form.setAttribute("method", "post");
+                form.setAttribute("action", "/house");
+
+                var rest = document.createElement("input");
+                rest.setAttribute("type", "hidden");
+                rest.setAttribute("name", "restrict")
+                rest.setAttribute("value", "true");
+
+                var re = document.createElement("input");
+                re.setAttribute("type", "hidden");
+                re.setAttribute("name", "rest");
+                re.setAttribute("value", restrict);
+                
+                var idField = document.createElement("input");
+                idField.setAttribute("type", "hidden");
+                idField.setAttribute("name", "user_id")
+                idField.setAttribute("value", user_id);
+
+                form.appendChild(rest);
+                form.appendChild(re);
+                form.appendChild(idField);
+
+                document.body.appendChild(form);
+                form.submit();
+            }
+
+            function payBill(bill_id, paid_date) {
+                var form = document.createElement("form");
+                form.setAttribute("method", "post");
+                form.setAttribute("action", "/house");
+
+                var pay_bill = document.createElement("input");
+                pay_bill.setAttribute("type", "hidden");
+                pay_bill.setAttribute("name", "pay_bill")
+                pay_bill.setAttribute("value", "true");
+
+                var id = document.createElement("input");
+                id.setAttribute("type", "hidden");
+                id.setAttribute("name", "bill_id");
+                id.setAttribute("value", bill_id);
+
+                var paid = document.createElement("input");
+                paid.setAttribute("type", "hidden");
+                paid.setAttribute("name", "paid");
+                paid.setAttribute("value", paid_date);
+
+                form.appendChild(pay_bill);
+                form.appendChild(id);
+                form.appendChild(paid);
+
+                document.body.appendChild(form);
+                form.submit();
+            }
+
+            function changeBillSplit(totals, matecount) {
+                console.log("changeBillSplit()");
+                console.log("totals: " + totals.length);
+                var total       = document.getElementById('bill_total'),
+                    selector    = document.getElementById('bill_select');
+                console.log("selectedIndex: " + selector.selectedIndex);
+
+                total.innerHTML = totals[selector.selectedIndex - 1].toFixed(2);
+
+                document.getElementById('split').value = (total.innerHTML / (matecount + 1)).toFixed(2);
+
+                for (var i = 0; i < matecount; i++) {
+                    document.getElementById('split_' + i).value = (total.innerHTML / (matecount + 1)).toFixed(2);
+                }
+            }
+
+            function submitBillSplit(user_ids) {
+                var form = document.createElement("form");
+                form.setAttribute("method", "post");
+                form.setAttribute("action", "/house");
+
+                var splits = [];
+
+                splits[0] = {
+                    user_id:    user_ids[0],
+                    amount:     document.getElementById('split').value
+                };
+
+                for (var i = 1; i < user_ids.length; i++) {
+                    splits[i] = {
+                        user_id:    user_ids[i],
+                        amount:     document.getElementById('split_' + (i - 1)).value
+                    };
+                }
+
+                var billSplit = document.createElement("input");
+                billSplit.setAttribute("type", "hidden");
+                billSplit.setAttribute("name", "create_split");
+                billSplit.setAttribute("value", "true");
+
+                var split = document.createElement("input");
+                split.setAttribute("type", "hidden");
+                split.setAttribute("name", "splits");
+                split.setAttribute("value", JSON.stringify(splits));
+
+                var id = document.createElement("input");
+                id.setAttribute("type", "hidden");
+                id.setAttribute("name", "bill_id");
+                id.setAttribute("value", document.getElementById('bill_select').value);
+
+                form.appendChild(billSplit);
+                form.appendChild(split);
+                form.appendChild(id);
+
+                document.body.appendChild(form);
+                form.submit();
+            }
+
+            function paySplit(split_id) {
+                var form = document.createElement("form");
+                form.setAttribute("method", "post");
+                form.setAttribute("action", "/house");
+
+                var pay_split = document.createElement("input");
+                pay_split.setAttribute("type", "hidden");
+                pay_split.setAttribute("name", "pay_split");
+                pay_split.setAttribute("value", "true");
+
+                var id = document.createElement("input");
+                id.setAttribute("type", "hidden");
+                id.setAttribute("name", "split_id");
+                id.setAttribute("value", split_id);
+
+                form.appendChild(pay_split);
+                form.appendChild(id);
+
+                document.body.appendChild(form);
+                form.submit();
+            }
+
+            function declineSplit(split_id) {
+                var form = document.createElement("form");
+                form.setAttribute("method", "post");
+                form.setAttribute("action", "/house");
+
+                var pay_split = document.createElement("input");
+                pay_split.setAttribute("type", "hidden");
+                pay_split.setAttribute("name", "decline_split");
+                pay_split.setAttribute("value", "true");
+
+                var id = document.createElement("input");
+                id.setAttribute("type", "hidden");
+                id.setAttribute("name", "split_id");
+                id.setAttribute("value", split_id);
+
+                form.appendChild(pay_split);
+                form.appendChild(id);
+
+                document.body.appendChild(form);
+                form.submit();
+            }
+        </script>
+    </head>
+    <body>
+        <header>
+            <% include partials/header %>
+        </header>
+        <main>
+            <div class="content">
+                <% if (house_info.house_id == 0) { %>
+                    <h1>Add a House</h1>
+                    <hr>
+                        <br>
+                    <form action="/house" method="post">
+                        <input type="hidden" name="add_house" value="true" />
+                        <input type="text" name="house_name" placeholder="House Name" required />
+                        <br><br><br>
+                        <input type="text" name="address1" placeholder="Address Line 1" required />
+                        <br><br>
+                        <input type="text" name="address2" placeholder="Address Line 2" />
+                        <br><br>
+                        <input type="text" name="city" placeholder="City" required></input>
+                        <br><br>
+                        <% include partials/states %>
+                        <br><br>
+                        <input type="text" name="zip" placeholder="Zip Code" onkeypress="return event.charCode >= 48 && event.charCode <= 57" required />
+                        <br><br>
+                        <input type="submit" value="Submit House" required />
+                    </form>
+                <% } else { %>
+                    <h1>My House</h1>
+                    <hr>
+                    <div id="info_div">
+                        <h2 id="name"><%= house_info.name %></h2>
+                        <h3 id="address1"><%= house_info.address1 %></h3>
+                        <% if (house_info.address2 != null && house_info.address2.length > 0) { %>
+                            <h3 id="address2"><%= house_info.address2 %></h3>
+                        <% } %>
+                        <h3 id="city_state_zip"><%= house_info.city %>, <%= house_info.state %> <%= house_info.zip %></h3>
+                        <button onclick="editInfo();">Edit Info</button>
+                    </div>
+                    <div id="edit_info_div" style="display: none;">
+                        <form action="/house" method="post">
+                            <input type="hidden" name="edit_house" value="true" />
+                            <input type="text" name="house_name" placeholder="House Name" value="<%= house_info.name %>" required />
+                            <br><br><br>
+                            <input type="text" name="address1" placeholder="Address Line 1" value="<%= house_info.address1 %>" required />
+                            <br><br>
+                            <input type="text" name="address2" placeholder="Address Line 2" value="<%= house_info.address2 %>" />
+                            <br><br>
+                            <input type="text" name="city" placeholder="City" value="<%= house_info.city %>" required />
+                            <br><br>
+                            <% include partials/states %>
+                            <br><br>
+                            <input type="text" name="zip" placeholder="Zip Code" value="<%= house_info.zip %>" onkeypress="return event.charCode >= 48 && event.charCode <= 57" required />
+                            <br><br>
+                            <input type="submit" value="Submit House" required />
+                            <button onclick="cancelEdit(); return false;">Cancel</button>
+                        </form>
+                    </div>
+                    <br><br>
+                    <hr>
+                    <h2>House Mates</h2>
+                    <% if (house_mates.length == 0) { %>
+                        <br>
+                        <p><i>You currently have no house mates</i></p>
+                    <% } else { %>
+                        <table class="data_tables">
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Username</th>
+                                <th>Restricted</th>
+                                <th>Remove</th>
+                            </tr>
+                            <% house_mates.forEach(function(mate) { %>
+                                <tr>
+                                    <td><%= mate.firstname %> <%= mate.lastname %></td>
+                                    <td><%= mate.email %></td>
+                                    <td><%= mate.username %></td>
+                                    <td>
+                                    <% if (mate.restricted == 1) { %>
+                                        <button onclick="restrict(<%= mate.user_id %>, 'false');">RESTRICTED</button>
+                                    <% } else { %>
+                                        <button onclick="restrict(<%= mate.user_id %>, 'true');">Unrestricted</button>
+                                    <% } %>
+                                    </td>
+                                    <td>
+                                        <button onclick="removeMate(<%= mate.user_id %>, '<%= mate.username %>');">Remove</button>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </table>
+                    <% } %>
+                    <br>
+                    <form action="/house" method="post">
+                        <p>Invite Housemates:  
+                        <input type="hidden" name="add_house_mate" value="true"></input>
+                        <input type="text" name="email" placeholder="Email"></input>
+                        <button>Invite</button>
+                        </p>
+                    </form>
+                    <br><br>
+                    <hr>
+                    <h2>House Balance</h2>
+                    <h3>$<%= house_info.balance.toFixed(2) %></h3>
+                    <br><br>
+                    <hr>
+                    <h2>Split Bills</h2>
+
+                    <% if (!restricted && house_mates.length > 0) { %>
+                        <h3>Make Split Request</h3>
+                        <% var user_ids = []; %>
+                        <% user_ids[0] = user_id %>
+                        <% house_mates.forEach(function(mate) { %>
+                            <% user_ids[user_ids.length] = mate.user_id; %>
+                        <% }); %>
+                        <form onsubmit="submitBillSplit(<%= JSON.stringify(user_ids) %>); return false;" method="post">
+                            <% var totals=[]; %>
+                            <% bills.forEach(function(bill) { %>
+                                <% totals[totals.length] = bill.amount; %>
+                            <% }); %>
+                            <select id="bill_select" name="split_bill" onchange="if(this.selectedIndex) changeBillSplit(<%= JSON.stringify(totals) %>,<%= house_mates.length %>);" required>
+                                <option selected disabled>Choose Bill</option>
+                                <% bills.forEach(function(bill) { %>
+                                    <option value="<%= bill.bill_id %>"><%= bill.name %></option>
+                                <% }); %>
+                            </select>
+                            <br><br>
+                            <h3><b>Total:</b> $<span id="bill_total">0.00</span></h3>
+                            <br><br>
+                            <table class="data_tables">
+                                <tr>
+                                    <th>House Mate</th>
+                                    <th>Amount to Pay</th>
+                                </tr>
+                                <tr>
+                                    <td>Me</td>
+                                    <td>$<input id="split" type="number" value="0" /></td>
+                                </tr>
+                                <% var mate_count = 0; %>
+                                <% house_mates.forEach(function(mate) { %>
+                                    <tr>
+                                        <td><%= mate.username %></td>
+                                        <td>
+                                            $<input id="split_<%= mate_count %>" type="number" value="0" />
+                                        </td>
+                                    </tr>
+                                    <% mate_count++; %>
+                                <% }); %>
+                            </table>
+                            <br>
+                            <input type="submit" value="Submit Split Request" />
+                        </form>
+                    <% } %>
+                    <% if (splits.length > 0) { %>
+                        <br><br>
+                        <h3>Split Requests</h3>
+                        <table class="data_tables">
+                            <tr>
+                                <th>Bill</th>
+                                <th>Request Author</th>
+                                <th>House Mates</th>
+                                <th>Amounts</th>
+                                <th>Status</th>
+                                <th></th>
+                            </tr>
+                            <% splits.forEach(function(split) { %>
+                                <tr>
+                                    <td><%= split.name %></td>
+                                    <td><%= split.username %></td>
+                                    <td>
+                                        <% split.splitters.forEach(function(splitter) { %>
+                                            <p><%= splitter.username %></p>
+                                        <% }); %>
+                                    </td>
+                                    <td>
+                                        <% split.splitters.forEach(function(splitter) { %>
+                                            <p><%= splitter.amount %></p>
+                                        <% }); %>
+                                    </td>
+                                    <td>
+                                        <% split.splitters.forEach(function(splitter) { %>
+                                            <% if (splitter.status == 0) { %>
+                                                <p>PENDING</p>
+                                            <% } else if (splitter.status == 1) { %>
+                                                <p>PAID</p>
+                                            <% } else if (splitter.status == 2) { %>
+                                                <p>DECLINED</p>
+                                            <% } %>
+                                        <% }); %>
+                                    </td>
+                                    <td>
+                                        <button onclick="paySplit(<%= split.split_id %>);">Pay</button>
+                                        <button onclick="declineSplit(<%= split.split_id %>);">Decline</button>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </table>
+                    <% } %>
+                    <br><br>
+                    <hr>
+                    <% if (bills != null && bills.length > 0) { %>
+                        <h2>Bills</h2>
+                        <table class="data_tables">
+                            <tr>
+                                <th>Service Provider</th>
+                                <th>Frequency</th>
+                                <th>Due Next</th>
+                                <th>Amount</th>
+                                <th></th>
+                            </tr>
+                            <% var now = new Date(); %>
+                            <% var start = new Date(now.getFullYear(), 0, 0); %>
+                            <% var diff = now - start; %>
+                            <% var oneDay = 1000 * 60 * 60 * 24 %>
+                            <% var day = Math.floor(diff / oneDay); %>
+                            <% bills.forEach(function(bill) { %>
+                                <tr>
+                                    <td><%= bill.name %></td>
+                                    <td><%= bill.freq %> time(s) per <%= bill.freq_type %></td>
+                                    <% var next = parseInt(bill.start_date); %>
+                                    <% var quant; %>
+                                    <% if (bill.freq_type == "week") { %>
+                                        <% quant = parseInt(7 / bill.freq); %>
+                                    <% } else if (bill.freq_type == "month") { %> 
+                                        <% quant = parseInt(30 / bill.freq); %>
+                                    <% } else { %>
+                                        <% quant = parseInt(365 / bill.freq); %>
+                                    <% } %>
+                                    <% while (next < day) { %>
+                                        <% next += quant; %>
+                                    <% } %>
+                                    <% var date = new Date(2016, 0); %>
+                                    <% var d = new Date(date.setDate(next)); %>
+                                    <td><%= d.getMonth() + 1 %> / <%= d.getDate() %> / <%= d.getFullYear() %></td>
+                                    <td>$<%= bill.amount.toFixed(2) %></td>
+                                    <td>
+                                        <% if (parseInt(bill.paid) < day) { %>
+                                            <button onclick="payBill(<%= bill.bill_id %>, <%= next %>)">Pay</button>
+                                        <% } else { %>
+                                            <button disabled>Pay</button>
+                                        <% } %>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </table>
+                        <br>
+                        <br>
+                    <% } %>
+                    <hr>
+                    <h2>Send and Request Money</h2>
+                    <form action="/house" method="post">
+                        <input type="hidden" name="send_request" value="true" />
+                        <input type="radio" name="send_req" value="send" checked>Send Money<br>
+                        <input type="radio" name="send_req" value="req" >Request Money<br><br>
+                        <select name="other_user" required>
+                            <option selected disabled>House Mate</option>
+                            <% house_mates.forEach(function(mate) { %>
+                                <option value="<%= mate.user_id %>"><%= mate.firstname %> <%= mate.lastname %></option>
+                            <% }); %>
+                            <option value="house">House Balance</option>
+                        </select><br><br>
+                        $<input type="text" name="amount" placeholder="Amount" onkeypress="return event.charCode >= 48 && event.charCode <= 57 || event.charCode == 46" required />
+                        <br><br>
+                        <input type="submit" value="Submit" />
+                    </form>
+                    <br><br>
+                    <hr>
+                    <h2>House Chat</h2>
+                    <% include partials/chat %>
+                <% } %>
+            </div>
+        </main>
+    </body>
+</html>

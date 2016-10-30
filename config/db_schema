@@ -1,0 +1,86 @@
+profiles (
+    user_id     INT NOT NULL AUTO_INCREMENT,
+    username    VARCHAR(255),
+    email       VARCHAR(255),
+    lastname    VARCHAR(255),
+    firstname   VARCHAR(255),
+    house_id    INT,
+    restricted  BOOLEAN,
+    balance     DECIMAL(7, 2),
+    PRIMARY KEY(user_id)
+);
+
+houses (
+    house_id    INT NOT NULL AUTO_INCREMENT,
+    name        VARCHAR(255),
+    address1    VARCHAR(255),
+    address2    VARCHAR(255),
+    city        VARCHAR(255),
+    state       VARCHAR(20),
+    zip         INT,
+    split_min   DECIMAL(7, 2),
+    split_max   DECIMAL(7, 2),
+    time        TIMESTAMP,
+    balance     DECIMAL(7, 3),
+    PRIMARY KEY(house_id)
+);
+
+bills (
+    bill_id     INT NOT NULL AUTO_INCREMENT,
+    house_id    INT,
+    provider_id INT,
+    start_date  DATE,
+    freq        INT,
+    freq_type   VARCHAR(20),
+    amount      DECIMAL(7,2),
+    paid        DATE,
+    PRIMARY KEY(bill_id)
+);
+
+transactions (
+    trans_id    INT NOT NULL AUTO_INCREMENT,
+    time        TIMESTAMP,
+    send_id     INT,
+    rec_id      INT,
+    amount      DECIMAL(7, 2),
+    status      INT,
+    house       BOOLEAN,
+    PRIMARY KEY(trans_id)
+);
+
+splits (
+    split_id    INT NOT NULL AUTO_INCREMENT,
+    house_id    INT,
+    bill_id     INT,
+    user_id     INT,
+    time        TIMESTAMP,
+    PRIMARY KEY(split_id)
+);
+
+splits_status (
+    split_id    INT,
+    user_id     INT,
+    status      INT,
+    amount      DECIMAL(7, 2)
+);
+
+messages (
+    time        TIMESTAMP,
+    house_id    INT,
+    user_id     INT,
+    message     VARCHAR(255)
+);
+
+house_invitations (
+    house_id    INT,
+    user_id     INT,
+    from_id     INT
+);
+
+service_providers (
+    provider_id INT NOT NULL AUTO_INCREMENT,
+    name        VARCHAR(255),
+    service     VARCHAR(255),
+    balance     DECIMAL(9, 2),
+    PRIMARY KEY(provider_id)
+);
